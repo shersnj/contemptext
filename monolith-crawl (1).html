@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITH — Opening Crawl</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Pathway+Gothic+One&family=Noto+Sans:wght@700&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* ─── STARFIELD CANVAS ─── */
+  canvas#starfield {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+  }
+
+  /* ─── PHASE 1: STATIC HEADER ("A long time ago...") ─── */
+  .header-phase {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .header-phase.active {
+    animation: headerFade 7s ease-in-out forwards;
+  }
+
+  .header-text {
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2.4vw, 1.8rem);
+    color: #4bd5ee;
+    text-align: center;
+    letter-spacing: 0.03em;
+    line-height: 1.9;
+    max-width: 70%;
+  }
+
+  @keyframes headerFade {
+    0%   { opacity: 0; }
+    15%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ─── PHASE 2: LOGO ─── */
+  .logo-phase {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .logo-phase.active {
+    animation: logoFade 6s ease-in forwards;
+  }
+
+  .logo-svg {
+    width: clamp(300px, 85vw, 1000px);
+    height: auto;
+  }
+
+  .logo-phase.active .logo-svg {
+    animation: logoShrink 6s ease-in forwards;
+  }
+
+  @keyframes logoFade {
+    0%   { opacity: 0; }
+    5%   { opacity: 1; }
+    65%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes logoShrink {
+    0%   { transform: scale(1); }
+    100% { transform: scale(0.08); }
+  }
+
+  /* ─── PHASE 3: THE CRAWL ─── */
+  /*
+    The "board" is the tilted 3D plane anchored at the
+    bottom of the screen. It has a static perspective
+    transform — the text scrolls INSIDE it.
+  */
+  .crawl-board {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    margin-left: -9em;
+    width: 18em;
+    height: 50em;
+    font-size: clamp(22px, 3.5vw, 38px);
+    overflow: hidden;
+    z-index: 8;
+    /* Static 3D tilt — this does NOT animate */
+    transform-origin: 50% 100%;
+    transform: perspective(300px) rotateX(25deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .crawl-board.active {
+    opacity: 1;
+  }
+
+  /* Gradient fade at the top — text vanishes into distance */
+  .crawl-board::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: 0;
+    bottom: 60%;
+    background: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* The scrolling content inside the board */
+  .crawl-content {
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    text-align: justify;
+    color: #feda4a;
+    font-family: 'Pathway Gothic One', sans-serif;
+    font-weight: 400;
+    line-height: 1.55;
+    letter-spacing: 0.02em;
+  }
+
+  .crawl-content.active {
+    animation: crawlScroll 120s linear forwards;
+  }
+
+  @keyframes crawlScroll {
+    0%   { top: 100%; }
+    100% { top: -280%; }
+  }
+
+  .episode-id {
+    text-align: center;
+    font-size: 0.9em;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    margin-bottom: 0.2em;
+  }
+
+  .episode-title {
+    text-align: center;
+    font-size: 1.6em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.5em;
+    line-height: 1.3;
+  }
+
+  .crawl-content p {
+    margin-bottom: 1.3em;
+    text-align: justify;
+  }
+
+  /* ─── START BUTTON ─── */
+  .start-btn {
+    position: fixed;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-family: 'Pathway Gothic One', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    cursor: pointer;
+    padding: 0.8em 2.5em;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.5);
+    transition: all 0.4s ease;
+  }
+
+  .start-btn:hover {
+    color: rgba(255,255,255,0.65);
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  .start-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+</style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="starfield"></canvas>
+
+<!-- Phase 1: Static Header -->
+<div class="header-phase" id="headerPhase">
+  <div class="header-text">
+    In a world of concrete shadows,<br>
+    under the weight of a dying sun....
+  </div>
+</div>
+
+<!-- Phase 2: Logo (SVG outlined style) -->
+<div class="logo-phase" id="logoPhase">
+  <svg class="logo-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+    <text x="450" y="210"
+      font-family="'Anton', 'Impact', 'Arial Black', sans-serif"
+      font-size="200"
+      font-weight="400"
+      text-anchor="middle"
+      letter-spacing="16"
+      fill="black"
+      stroke="#feda4a"
+      stroke-width="3"
+      stroke-linejoin="miter"
+      paint-order="stroke fill"
+    >MONOLITH</text>
+  </svg>
+</div>
+
+<!-- Phase 3: The Crawl Board (tilted plane) -->
+<div class="crawl-board" id="crawlBoard">
+  <div class="crawl-content" id="crawlContent">
+
+    <div class="episode-id">Part I</div>
+    <div class="episode-title">The Total Order Erodes</div>
+
+    <p>The empire of concrete is dying. Across six thousand kilometers of frost and doctrine, the pillars of the Soviet state crack under a silence no decree can mend. The Party speaks, but its words dissolve before they reach the factories. The planned economy staggers beneath the weight of its own contradictions, buckling at joints that were never meant to flex. The satellites drift from their orbits. From Tallinn to Tbilisi, something irreversible has begun, not with gunfire or proclamation but with the slow exhale of a system that has forgotten how to breathe. No one gives the order to collapse. The structure simply yields.</p>
+
+    <p>In Moscow, the Kremlin's corridors grow long and cold. Gorbachev's reforms, once heralded as the salvation of socialism, have split the monolith down its axis. Glasnost has opened a wound that cannot close. Perestroika has dismantled more than it has rebuilt. The republics stir. Lithuania. Georgia. Ukraine. Azerbaijan. Names whispered first in kitchens, then in squares, then shouted across borders where the signal can no longer be jammed. The old guard watches from behind curtains of cigarette smoke, paralyzed between the reflex to crush and the dawning knowledge that the hand no longer obeys the mind.</p>
+
+    <p>Across the Eastern Bloc, the fascist geometry of state architecture looms over emptying squares and deserted parade grounds. Buildings designed not to shelter but to annihilate the individual stand in massed facades of poured stone and hammered symmetry, each one engineered to compress the human spirit into obedience. Every column is a command. Every lintel is a sentence handed down without appeal. These structures were never homes. They were declarations of force rendered in aggregate and steel, built to make the citizen feel small and the state feel infinite.</p>
+
+    <p>But the concrete remembers nothing. The grand halls of the Palace of the Soviets, never completed, haunt the Moscow skyline as phantom geometry, a cathedral to a faith that could not sustain its own weight. The Buzludzha monument rots on its Balkan summit, a flying saucer of ideology grounded by its own mass, its mosaic ceiling cracked open to the rain. In Bucharest, the People's Palace swallows light and returns nothing. In East Berlin, the Stasi headquarters hum with the static of ten million intercepted lives, filing cabinets breathing in the dark like the lungs of a vast and patient beast that does not yet know it is already dead.</p>
+
+    <p>The architecture of suppression is the architecture of fear made permanent. Fascist and Soviet planners shared a common tongue, the obliteration of human scale, the erasure of the individual figure against walls that rise without mercy or interruption. Albert Speer dreamed in granite, his boulevards designed for a thousand years of torchlit procession. Stalin built in concrete, his towers crowned with stars that watched like unblinking eyes. Both sought the same submission. Both understood that to control the body, one must first overwhelm the senses with the sheer and absolute indifference of stone.</p>
+
+    <p>Now the order erodes. Frost enters through the cracks the architects never anticipated, because the architects never anticipated an end. The Wall will fall. The statues will be pulled from their plinths by hands that once saluted them. The flags will be folded, the anthems silenced, the maps redrawn in borders that bleed. But the buildings will remain. They will stand long after the last commissar has been forgotten, their shadows stretching across generations yet unborn, monuments not to triumph but to the terrible patience of stone and the frailty of every empire that believed itself eternal.</p>
+
+    <p>The sun sets behind the concrete. It does not rise again.</p>
+
+  </div>
+</div>
+
+<!-- Start Button -->
+<button class="start-btn" id="startBtn">Begin</button>
+
+<script>
+// ─── STARFIELD ───
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+const STAR_COUNT = 500;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < STAR_COUNT; i++) {
+    stars.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 1.3 + 0.2,
+      a: Math.random() * 0.5 + 0.5,
+      ts: Math.random() * 0.006 + 0.001,
+      to: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+function drawStars(t) {
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  for (const s of stars) {
+    const flicker = 0.65 + 0.35 * Math.sin(t * s.ts + s.to);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a * flicker})`;
+    ctx.fill();
+  }
+}
+
+function animateStars(t) {
+  drawStars(t);
+  requestAnimationFrame(animateStars);
+}
+
+window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+resizeCanvas();
+initStars();
+requestAnimationFrame(animateStars);
+
+// ─── SEQUENCE CONTROLLER ───
+const headerPhase  = document.getElementById('headerPhase');
+const logoPhase    = document.getElementById('logoPhase');
+const crawlBoard   = document.getElementById('crawlBoard');
+const crawlContent = document.getElementById('crawlContent');
+const startBtn     = document.getElementById('startBtn');
+
+startBtn.addEventListener('click', () => {
+  startBtn.classList.add('hidden');
+
+  // Phase 1: Header fades in/out (0s – 7s)
+  headerPhase.classList.add('active');
+
+  // Phase 2: Logo appears and shrinks (starts at ~7.5s)
+  setTimeout(() => {
+    logoPhase.classList.add('active');
+  }, 7500);
+
+  // Phase 3: Crawl board becomes visible, text starts scrolling (starts at ~14s)
+  setTimeout(() => {
+    crawlBoard.classList.add('active');
+    crawlContent.classList.add('active');
+  }, 14000);
+});
+</script>
+</body>
+</html>
